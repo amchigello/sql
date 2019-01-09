@@ -160,3 +160,50 @@ EMPNO   DEPTNO  SAL SUM_SAL
 10  30  1500    9400
 2   30  1600    9400
 6   30  2850    9400
+
+select empno, deptno, sal
+       ,SUM(sal) OVER (PARTITION BY deptno order by sal
+        ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING
+        ) as sum_sal
+  from emp
+  ORDER BY 2,3;
+
+EMPNO DEPTNO  SAL SUM_SAL
+14  10  1300  8750
+7 10  2450  8750
+9 10  5000  8750
+1 20  800 4875
+11  20  1100  7875
+4 20  2975  10875
+8 20  3000  10075
+13  20  3000  8975
+12  30  950 3450
+5 30  1250  4950
+3 30  1250  6550
+10  30  1500  8450
+2 30  1600  7200
+6 30  2850  5950
+
+
+select empno, deptno, sal
+       ,SUM(sal) OVER (PARTITION BY deptno order by sal
+        ROWS BETWEEN unbounded PRECEDING AND unbounded FOLLOWING
+        ) as sum_sal
+  from emp
+  ORDER BY 2,3;
+
+EMPNO DEPTNO  SAL SUM_SAL
+14  10  1300  8750
+7 10  2450  8750
+9 10  5000  8750
+1 20  800 10875
+11  20  1100  10875
+4 20  2975  10875
+8 20  3000  10875
+13  20  3000  10875
+12  30  950 9400
+5 30  1250  9400
+3 30  1250  9400
+10  30  1500  9400
+2 30  1600  9400
+6 30  2850  9400
