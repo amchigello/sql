@@ -222,3 +222,11 @@ EMPNO DEPTNO  SAL SUM_SAL
 10  30  1500  9400
 2 30  1600  9400
 6 30  2850  9400
+
+---Hierarchichal Queries
+
+select e.*,level
+  from hr.employees e
+  start with manager_id is null
+connect by manager_id = prior employee_id;
+
