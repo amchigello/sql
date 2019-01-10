@@ -1,3 +1,18 @@
+--self join
+
+
+with qry
+as
+(
+select 1 as col from dual
+union
+select 2 from dual
+union
+select 3 from dual
+)
+select a.col 
+from qry a, qry b
+where a.col >= b.col
 
 
 --Get employees has saleary more than their managers
