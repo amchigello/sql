@@ -225,8 +225,8 @@ EMPNO DEPTNO  SAL SUM_SAL
 
 ---Hierarchichal Queries
 
-select e.*,level
-  from hr.employees e
-  start with manager_id is null
-connect by manager_id = prior employee_id;
+select e.*,level,LTRIM(SYS_CONNECT_BY_PATH(manager_id, '-'), '-') AS path
+from hr.employees e
+start with manager_id is null
+connect by manager_id = prior employee_id
 
