@@ -268,3 +268,13 @@ insert into tasks values('T3',3,'C');
 SELECT A.*,
        LAG(STATUS,STEPS-1,STATUS) OVER (PARTITION BY TASK_ID ORDER BY STEPS) AS VAL
   FROM TASKS A;
+  
+select e1.first_name,e1.salary,e1.department_id
+  from hr.employees e1
+ where 2-1 = (select count(distinct salary)
+                 from hr.employees e2
+                where e2.salary>e1.salary
+                and e1.department_id=e2.department_id
+                )
+order by 3;
+
