@@ -9,6 +9,16 @@ select m.employee_id as mgr_id,m.last_name as mgr_name,
  )
  where emp_sal = max_sal;
  
+ select * from(
+select e.employee_id ,e.last_name,m.department_id,
+       m.department_name,e.salary,
+       max(e.salary) keep (dense_rank last order by e.salary) over (partition by m.department_name) as max_sal,
+       max(e.salary) keep (dense_rank first order by e.salary) over (partition by m.department_name) as min_sal 
+  from hr.employees e, hr.departments m
+ where e.department_id = m.department_id
+ )
+ where (salary = max_sal or salary = min_sal);
+ 
 with qry
 as
 (
