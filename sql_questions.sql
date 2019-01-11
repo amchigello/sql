@@ -1,6 +1,14 @@
 --self join
 
-
+select * from(
+select m.employee_id as mgr_id,m.last_name as mgr_name,
+       e.last_name as employee_name,e.salary as emp_sal,
+       max(e.salary) keep (dense_rank last order by e.salary) over (partition by m.employee_id) as max_sal 
+  from hr.employees e, hr.employees m
+ where e.manager_id = m.employee_id(+)
+ )
+ where emp_sal = max_sal;
+ 
 with qry
 as
 (
