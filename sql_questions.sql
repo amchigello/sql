@@ -248,3 +248,23 @@ from hr.employees e
 start with manager_id is null
 connect by manager_id = prior employee_id
 
+create table tasks
+(
+task_id  varchar2(2),
+steps    number,
+status   varchar2(1)
+);
+
+insert into tasks values('T1',1,'C');
+insert into tasks values('T1',2,'W');
+insert into tasks values('T1',3,'W');
+insert into tasks values('T2',1,'W');
+insert into tasks values('T2',2,'C');
+insert into tasks values('T2',3,'C');
+insert into tasks values('T3',1,'C');
+insert into tasks values('T3',2,'W');
+insert into tasks values('T3',3,'C');
+
+SELECT A.*,
+       LAG(STATUS,STEPS-1,STATUS) OVER (PARTITION BY TASK_ID ORDER BY STEPS) AS VAL
+  FROM TASKS A;
