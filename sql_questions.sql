@@ -278,3 +278,11 @@ select e1.first_name,e1.salary,e1.department_id
                 )
 order by 3;
 
+select explode(col2) from table1;
+
+select author_name, exploded_books 
+  from table1 lateral view explode(books_name) dummy as exploded_books;
+
+select key, value 
+  from table1 lateral view explode(books_name) dummy as key,value;
+
