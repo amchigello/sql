@@ -286,3 +286,64 @@ select author_name, exploded_books
 select key, value 
   from table1 lateral view explode(books_name) dummy as key,value;
 
+drop table dim_user;
+--dim table 
+
+drop table dim_user_stg;
+--incremental table
+
+create table dim_user
+(
+user_id  number,
+user_name varchar2(10),
+start_dt  date,
+end_dt  date
+);
+
+insert into dim_user values(1,'abc',sysdate-10,null);
+insert into dim_user values(2,'def',sysdate-10,sysdate-9);
+insert into dim_user values(2,'ghi',sysdate-9,null);
+
+create table dim_user_stg
+(
+user_id  number,
+user_name varchar2(10)
+);
+
+
+insert into dim_user_stg values(1,'123');
+insert into dim_user_stg values(2,'456');
+insert into dim_user_stg values(3,'789');
+
+drop table dim_user_stg1;  
+--stage table
+
+create table dim_user_stg1
+(
+rid       rowid,
+user_id  number,
+user_name varchar2(10)
+);
+
+insert into dim_user_stg1
+select b.rowid as rid,a.*
+  from dim_user_stg a,
+       dim_user b
+where a.user_id=b.user_id(+)
+  and end_dt is null;
+  
+
+insert into dim_user
+  select user_id,user_name,sysdate,null from dim_user_stg1;
+  
+merge into dim_user t
+   using dim_user_stg1 s
+   on (s.rid=t.rowid)
+ when matched then
+	update set end_dt=sysdate-1;
+ 
+ 
+ select * from dim_user;
+ 
+ 
+ 
