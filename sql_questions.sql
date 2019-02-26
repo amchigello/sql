@@ -32,6 +32,12 @@ select a.col
 from qry a, qry b
 where a.col >= b.col
 
+--nth highest salary
+
+SELECT name, salary 
+FROM #Employee e1
+WHERE N-1 = (SELECT COUNT(DISTINCT salary) FROM #Employee e2
+WHERE e2.salary > e1.salary)
 
 --Get employees has saleary more than their managers
 
