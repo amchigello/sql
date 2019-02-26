@@ -298,17 +298,21 @@ drop table dim_user;
 drop table dim_user_stg;
 --incremental table
 
+
 create table dim_user
 (
 user_id  number,
 user_name varchar2(10),
 start_dt  date,
-end_dt  date
+end_dt  date,
+active varchar2(1)
 );
 
-insert into dim_user values(1,'abc',sysdate-10,null);
-insert into dim_user values(2,'def',sysdate-10,sysdate-9);
-insert into dim_user values(2,'ghi',sysdate-9,null);
+insert into dim_user values(1,'abc',sysdate-10,null,'Y');
+insert into dim_user values(2,'def',sysdate-10,sysdate-9,'N');
+insert into dim_user values(2,'ghi',sysdate-9,null,'Y');
+
+commit;
 
 create table dim_user_stg
 (
@@ -325,29 +329,21 @@ drop table dim_user_stg1;
 --stage table
 
 create table dim_user_stg1
-(
-rid       rowid,
-user_id  number,
-user_name varchar2(10)
-);
-
-insert into dim_user_stg1
-select b.rowid as rid,a.*
-  from dim_user_stg a,
-       dim_user b
+as
+select a.user_id,a.user_name,sysdate as start_dt,cast(null as date) as end_dt,'Y' as active from dim_user_stg a, dim_user b
 where a.user_id=b.user_id(+)
-  and end_dt is null;
-  
-
-insert into dim_user
-  select user_id,user_name,sysdate,null from dim_user_stg1;
+and b.end_dt is null;
   
 merge into dim_user t
-   using dim_user_stg1 s
-   on (s.rid=t.rowid)
- when matched then
-	update set end_dt=sysdate-1;
- 
+  using(select * from dim_user_stg1) s
+on (s.user_id=t.user_id)
+when matched then update set END_DT=sysdate,active='N'
+where end_dt is null;
+
+insert into dim_user
+select * from dim_user_stg1
+
+commit;
  
  select * from dim_user;
  
