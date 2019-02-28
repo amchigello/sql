@@ -347,5 +347,58 @@ commit;
  
  select * from dim_user;
  
+ --scd type 3
+ --SCD Type3 Implementation
+
+drop table dim_user_scd_3;
+
+create table dim_user_scd_3
+(
+user_id      number,
+curr_user_name    varchar2(10),
+prev_user_name    varchar2(10)
+);
+
+insert into dim_user_scd_3 values(1,'Pandu','Nayak');
+insert into dim_user_scd_3 values(2,'Rashmi','');
+insert into dim_user_scd_3 values(3,'John','Jon');
+insert into dim_user_scd_3 values(4,'Kevin','');
+
+commit;
+
+drop table dim_user_stg;
+
+create table dim_user_stg
+(
+user_id  number,
+user_name  varchar2(10)
+);
+
+insert into dim_user_stg values(1,'Pandu');
+insert into dim_user_stg values(2,'Rashmi M');
+insert into dim_user_stg values(3,'Jon');
+insert into dim_user_stg values(4,'Kelvin');
+insert into dim_user_stg values(5,'Penny');
+
+commit;
+
+MERGE INTO DIM_USER_SCD_3 T
+USING(
+SELECT  B.USER_ID,
+       B.USER_NAME AS CURR_USER_NAME,
+       A.CURR_USER_NAME AS PREV_USER_NAME  
+  FROM DIM_USER_SCD_3 A,  DIM_USER_STG B
+WHERE A.USER_ID(+)=B.USER_ID
+AND NVL(A.CURR_USER_NAME,'-99') <> NVL(B.USER_NAME,'-99') 
+) S
+ON (S.USER_ID=T.USER_ID)
+WHEN MATCHED THEN
+UPDATE SET T.CURR_USER_NAME = S.CURR_USER_NAME,
+           T.PREV_USER_NAME = S.PREV_USER_NAME;
+
+COMMIT;    
+
+SELECT * FROM DIM_USER_SCD_3;
+
  
  
